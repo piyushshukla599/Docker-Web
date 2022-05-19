@@ -35,7 +35,7 @@ switch($cmd){
     case "exec":
         echo "<br />";
         echo "<pre>";
-        $cmd2 = "sudo docker exec -it $y $z";
+        $cmd2 = "sudo docker exec -t $y $z";
         $content = system($cmd2, $ret);
         echo "</pre>";
         echo "<br />";
