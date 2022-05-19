@@ -27,7 +27,7 @@ switch($cmd){
     case "run":
         echo "<br />";
         echo "<pre>";
-        $cmd2 = "sudo docker run -dit $y $z";
+        $cmd2 = "sudo docker run -dit $y:$z";
         $content = system($cmd2, $ret);
         echo "</pre>";
         echo "<br />";
@@ -35,7 +35,7 @@ switch($cmd){
     case "exec":
         echo "<br />";
         echo "<pre>";
-        $cmd2 = "sudo docker exec -d $y $z";
+        $cmd2 = "sudo docker exec -it $y $z";
         $content = system($cmd2, $ret);
         echo "</pre>";
         echo "<br />";
