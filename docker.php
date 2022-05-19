@@ -217,7 +217,7 @@
         document.getElementById(b1).style.display = "none";
         document.getElementById(b2).style.display = "block";
         var xhr = new XMLHttpRequest();
-	xhr.open("GET", "http://<?=$servname; ?>/html/cmd.php?x=" + cmd, true);
+	xhr.open("GET", "http://<?=$servname; ?>/cmd.php?x=" + cmd, true);
         document.getElementById(p).innerHTML = "Output is Coming, Please Wait...";
         xhr.send();
         xhr.onload = function() {
@@ -240,7 +240,7 @@
         document.getElementById(b2).style.display = "block";
         var y = document.getElementById(name).value;
         document.getElementById(name).style.display = "none";
-        xhr.open("GET", "http://<?=$servname; ?>/html/cmd.php?x=" + cmd + "&y=" + y, true);
+        xhr.open("GET", "http://<?=$servname; ?>/cmd.php?x=" + cmd + "&y=" + y, true);
         xhr.send();
         xhr.onload = function() {
             var output = xhr.responseText;
@@ -267,7 +267,7 @@
         document.getElementById(b2).style.display = "block";
         var y = document.getElementById(img).value;
         var z = document.getElementById(ver).value;
-	xhr.open("GET", "http://<?=$servname; ?>/html/cmd.php?x=" + cmd + "&y=" + y + "&z=" + z, true);
+	xhr.open("GET", "http://<?=$servname; ?>/cmd.php?x=" + cmd + "&y=" + y + "&z=" + z, true);
         xhr.send();
         xhr.onload = function() {
             var output = xhr.responseText;
