@@ -460,7 +460,7 @@
                             </div>
                             <div class="modal-body2">
                                 <br /><br />
-                                <h6 id="l4">Enter Container ID / Name : </h6>
+                                <h6 id="l4">Enter Image ID / Name : </h6>
                                 <input type="text" class="form-control" id="remi" placeholder="Image Name" required>
                                 <p id="p5"></p>
 
