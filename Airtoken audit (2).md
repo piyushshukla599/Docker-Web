@@ -3,7 +3,7 @@
 
 # Introduction
 
-A smart contract security review of the **Upgradeable AxirToken contract**  was done by **Piyush shukla**, with a focus on the security aspects of the application's smart contracts implementation.
+A smart contract security review of the **Staking contract**  was done by **Piyush shukla**, with a focus on the security aspects of the application's smart contracts implementation.
 
 # Disclaimer
 
@@ -36,7 +36,7 @@ _explanation what the protocol does, some architectural comments, technical docu
 
 # Security Assessment Summary
 
-**_review commit hash_ - Upgradeable AxirToken**
+**_review commit hash_ - Staking contract**
 
 **_fixes review commit hash_ - [](github.com)**
 
@@ -44,7 +44,7 @@ _explanation what the protocol does, some architectural comments, technical docu
 
 The following smart contracts were in scope of the audit:
 
-- `UpgradeableAxirToken`
+- `Staking contract`
 
 
 ---
@@ -53,53 +53,20 @@ The following smart contracts were in scope of the audit:
 
 | ID     | Title                      | Severity | Status |
 | ------ | -----------------------    | -------- | ------ |
-| [H-01] | Centralization Risk : If owner Account was compromised .then all function are useless                          | High      | Pending  |
-| [M-01] | whenNotPaused modifier always be first modifier    | Medium      | Pending   |
-| [M-02] | Missing zero check in recipient address   | Medium      | Pending   |
-| [L-01] | Unused library should be remove     | low      | Pending  |
-| [I-01] | Recommended to use Safemath library     | informative      | Pending  |
+| [H-01] |Use safeTransferFrom and safeTransfer instead of TransferFrom and Transfer    | High      | Pending  |
+| [H-01] |Missing maximum limit check in the newFees   | High      | Pending   |
 
 # Detailed Findings
 
 
-## [H-01]Centralization Risk : If owner Account is compromised then it make huge disaster to contract
+## [H-01]Use safeTransferFrom and safeTransfer instead of TransferFrom and Transfer
 
-Smart contract lies in the fact that only the contract owner (the entity that deployed the contract) has the authority to mint and burn tokens. This means that the owner has full control over the token supply and can manipulate it at will. Which make more centralized this contract, if anypoint owner loose the control , or malicious owner takeover the control of owner. it is big disaster to contract
-
+In the current contract context, you are using the transferFrom and transfer functions, which do not provide a return value. This can lead to situations where tokens may return true or false instead of reverting, potentially resulting in a direct loss of funds. To address this, it is advisable to replace transferFrom and transfer with safeTransferFrom and safeTransfer to ensure safer token transfers.
 
 ### Mitigation
 
-To mitigate this centralization issue, the contract could implement a multi-role approach. Instead of having only the contract owner perform minting and burning, the contract could define multiple roles with specific permissions. For example, separate roles for minting and burning could be created, and these roles could be assigned to different addresses. This way, the power to create and destroy tokens is distributed among different entities, reducing the risk of abuse by a single party.
+use OpenZeppelin’s SafeERC20 , And use `safeTransferFrom` and `safeTransfer` instead `TransferFrom` and `Transfer`
 
-
-#### Add these modifier in code 
-```
-
-modifier onlyMinter() {
-    require(msg.sender == minter, "Not a minter");
-    _;
-}
-
-modifier onlyBurner() {
-    require(msg.sender == burner, "Not a burner");
-    _;
-}
-```
-And update `mint and burn` function like this 
-
-```
-function mint(address _userAddress, uint256 _amount) public whenNotPaused `onlyMinter`  {
-    require(_userAddress != address(0), "Invalid user address");
-    require(totalSupply() + _amount <= maxTokenSupply, "Exceeds max supply");
-    _mint(_userAddress, _amount);
-}
-
-function burn(uint256 _amount) public whenNotPaused `onlyBurner` {
-    _burn(msg.sender, _amount);
-}
-
-```
-By implementing these changes, you distribute the authority to mint and burn tokens among different addresses with specific roles, reducing the centralization risk and increasing the overall decentralization of the token system.
 
 ## Severity
 High
@@ -107,57 +74,26 @@ High
 ## Status
 Pending
 
-## [M-01]  whenNotPaused modifier always be first modifier
+## [H-02]  Missing maximum limit check in the newFees
 
-Always whenNotPaused modifier to implement before any other modifier
-
-correct the code in every function
-
-Use this 
+In the setStakingFees function, there is a missing maximum limit check in the newFees parameter
 ```
-function setTreasury(address _treasury) external whenNotPaused onlyOwner  {
-       require(_treasury != address(0), "Invalid treasury address");
-       treasuryContract = _treasury;
-       emit TreasuryChanged(_treasury);
-   }
+//  a fee setter onlyOwner function to set staking fees %age
+    function setStakingFees(uint256 _newFees) external whenNotPaused onlyOwner {
+        require(_newFees!=0,"Staking fees cannot be zero");
+        uint256 _oldFees=stakingFees;
+        stakingFees=_newFees;
+        emit StakingFeesChanged(_oldFees, _newFees);
+    }
+
 ```
- instead
-```
-function setTreasury(address _treasury) external onlyOwner whenNotPaused  {
-       require(_treasury != address(0), "Invalid treasury address");
-       treasuryContract = _treasury;
-       emit TreasuryChanged(_treasury);
-   }
-```
-## Severity
-Medium
+### Mitigation
 
-## Status
-Pending
-
-## [M-01] Missing zero check in recipient
-
-in _transfer function there is not check recipient address . if mistakly sender send funds in zer address then all funds will be loss
-
-add this 
-
-   ` require(recipient != address(0), "Invalid recipient address"); // Check for valid recipient `
-
-
-## [L-01] Unused library should be remove
-
-Remove Unused library 
-
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+Add `maxfees` limit in code
 
 
 ## Severity
-Low
+High
 
 ## Status
 Pending
-
-
-### Informative
-
-Recommended to use Safemath library to avoid any calculation issue which lead overflow or underflow  risk
